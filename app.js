@@ -10,6 +10,16 @@ var dishRouter = require('./routes/dishRouter');
 var leaderRouter = require('./routes/leaderRouter');
 var promoRouter = require('./routes/promoRouter');
 
+
+const mongoose = require('mongoose');
+// const Dishes = require('./models/dishes');
+const url = "mongodb://localhost:27017/conFusion";
+
+mongoose.connect(url) 
+  .then(database => {
+    console.log("Connected to Mongoose ODM correctly.");
+  }).catch(err => console.log(err));
+
 var app = express();
 
 // view engine setup
@@ -41,7 +51,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', {title: err.message});
 });
 
 module.exports = app;
