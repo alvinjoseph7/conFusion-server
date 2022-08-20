@@ -16,13 +16,29 @@ router.post('/signup', function(req, res, next) {
         res.json({err: err});
       }
       else {
-        // req.login(user);
-        passport.authenticate('local', {session: false})(req, res, () => {
-          var token = authenticate.getToken({_id: req.user._id});
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json({success: true, status: 'Registration Successful!'});
-        }) 
+        if (req.body.firstname) {
+          user.firstname = req.body.firstname;
+        }
+        if (req.body.lastname) {
+          user.lastname = req.body.lastname;
+        }
+        user.save()
+        .then(user => {
+          // passport.authenticate('local', {session: false})(req, res, () => {
+          //   var token = authenticate.getToken({_id: req.user._id});
+          //   res.statusCode = 200;
+          //   res.setHeader('Content-Type', 'application/json');
+          //   res.json({success: true, status: 'Registration Successful and you are logged in!', token: token});
+          // }) ;
+          res.redirect('/');
+          return;
+        }).catch(err => {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({err: err});
+          }
+        );
+
       }
   });
 });
