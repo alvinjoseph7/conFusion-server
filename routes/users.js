@@ -7,6 +7,16 @@ var authenticate = require('../authenticate');
 
 router.use(bodyParser.json());
 
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+  console.log(req.user);
+  Users.find()
+  .then(users => {
+    res.statusCode = 200;
+    res.setHeader('content-type', 'application/json');
+    res.json(users);
+  }).catch(err => next(err));
+});
+
 router.post('/signup', function(req, res, next) {
   Users.register(new Users({username: req.body.username}), 
     req.body.password, (err, user) => {
@@ -26,12 +36,10 @@ router.post('/signup', function(req, res, next) {
         .then(user => {
           // passport.authenticate('local', {session: false})(req, res, () => {
           //   var token = authenticate.getToken({_id: req.user._id});
-          //   res.statusCode = 200;
-          //   res.setHeader('Content-Type', 'application/json');
-          //   res.json({success: true, status: 'Registration Successful and you are logged in!', token: token});
           // }) ;
-          res.redirect('/');
-          return;
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: true, status: 'Registration Successful!'});
         }).catch(err => {
             res.statusCode = 500;
             res.setHeader('Content-Type', 'application/json');
