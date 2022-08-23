@@ -4,10 +4,11 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 const Users = require('../models/users');
 var authenticate = require('../authenticate');
+const cors = require('./cors');
 
 router.use(bodyParser.json());
-
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+router.options('/', cors.corsWithOptions, (req, res) => { res.sendStatus(200); });
+router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   console.log(req.user);
   Users.find()
   .then(users => {
@@ -17,7 +18,8 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, ne
   }).catch(err => next(err));
 });
 
-router.post('/signup', function(req, res, next) {
+router.options('/signup', cors.corsWithOptions, (req, res) => { res.sendStatus(200); });
+router.post('/signup', cors.corsWithOptions, function(req, res, next) {
   Users.register(new Users({username: req.body.username}), 
     req.body.password, (err, user) => {
       if (err) {
@@ -51,8 +53,8 @@ router.post('/signup', function(req, res, next) {
   });
 });
 
-
-router.post('/login', passport.authenticate('local', {session: false}), (req, res) => {
+router.options('/login', cors.corsWithOptions, (req, res) => { res.sendStatus(200); });
+router.post('/login', cors.corsWithOptions, passport.authenticate('local', {session: false}), (req, res) => {
   var token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('content-type', 'text/plain');
